@@ -9,7 +9,12 @@ interface User {
   id: string;
   full_name: string;
   role: string;
-  school: string | null;
+  school: string | null
+  
+  interface School {
+    id: string;
+      name: string;
+    };
   email?: string;
 }
 
@@ -21,6 +26,7 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     full_name: '',
+      const [schools, setSchools] = useState<School[]>([]);
     email: '',
     role: 'teacher',
         password: '',
@@ -56,6 +62,7 @@ export default function AdminUsersPage() {
       console.error('Error:', error);
       router.push('/login');
     }
+          loadSchools()
   };
 
   const loadUsers = async () => {
@@ -78,6 +85,20 @@ export default function AdminUsersPage() {
       setLoading(false);
     }
   };
+
+  const loadSchools = async () => {
+        try {
+                const { data, error } = await supabase
+                  .from('schools')
+                  .select('*')
+                  .order('name', { ascending: true });
+
+                if (error) throw error;
+                setSchools(data as School[]);
+              } catch (error) {
+                console.error('Error cargando colegios:', error);
+              }
+      };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -273,13 +294,18 @@ export default function AdminUsersPage() {
 
               <div>
                 <label className="block text-sm font-medium mb-1">Colegio</label>
-                <input
-                  type="text"
-                  value={formData.school}
-                  onChange={(e) => setFormData({...formData, school: e.target.value})}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
+            <select
+                            value={formData.school}
+                            onChange={(e) => setFormData({...formData, school: e.target.value})}
+                            className="w-full p-2 border rounded"
+                          >
+                          <option value="">Seleccione un colegio</option>
+                          {schools.map((school) => (
+                                            <option key={school.id} value={school.name}>
+                                                              {school.name}
+                                                            </option>
+                                          ))}
+                        </select></div>
 
               <div className="flex gap-2">
                 <button
