@@ -32,9 +32,7 @@ export default function DashboardPage() {
         .from('profiles')
         .select('role')
         .eq('id', session.user.id)
-        .single();
-
-      setUserRole(profile?.role || null);
+        .single();      setUserRole(profile?.role || null);
       console.error('Error:', error);
       router.push('/login');
     } finally {
