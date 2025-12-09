@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -11,130 +14,181 @@ export default function RegisterPage() {
     confirmPassword: '',
     schoolName: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de registro con Supabase
-    console.log('Formulario de registro:', formData);
-    alert('Funcionalidad de registro en desarrollo. Pronto podrás crear tu cuenta.');
+    setLoading(true);
+    setError(null);
+
+    // Validar contraseñas coincidan
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      setLoading(false);
+      return;
+    }
+
+    // Validar longitud de contraseña
+    if (formData.password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Registrar usuario en Supabase Auth
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            school_name: formData.schoolName
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (authData.user) {
+        // Crear perfil en la tabla profiles
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: formData.email,
+            full_name: formData.fullName,
+            school_name: formData.schoolName || null
+          });
+
+        if (profileError) {
+          console.error('Error al crear perfil:', profileError);
+        }
+
+        // Redirigir al dashboard
+        router.push('/dashboard');
+      }
+    } catch (error: any) {
+      console.error('Error al registrarse:', error);
+      setError(error.message || 'Error al crear la cuenta. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        {/* Logo y título */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">DL</span>
-            </div>
-          </Link>
+          <div className="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white font-bold text-2xl">DL</span>
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Crear Cuenta</h1>
           <p className="text-gray-600">Regístrate para comenzar a evaluar</p>
         </div>
 
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
               Nombre Completo
             </label>
             <input
-              id="fullName"
               type="text"
+              id="fullName"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={formData.fullName}
               onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               placeholder="Tu nombre completo"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Correo Electrónico
             </label>
             <input
-              id="email"
               type="email"
+              id="email"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700 mb-2">
               Nombre del Colegio (Opcional)
             </label>
             <input
-              id="schoolName"
               type="text"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              id="schoolName"
               value={formData.schoolName}
               onChange={(e) => setFormData({...formData, schoolName: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               placeholder="Tu institución educativa"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Contraseña
             </label>
             <input
-              id="password"
               type="password"
+              id="password"
               required
-              minLength={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               placeholder="Mínimo 6 caracteres"
             />
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
               Confirmar Contraseña
             </label>
             <input
-              id="confirmPassword"
               type="password"
+              id="confirmPassword"
               required
-              minLength={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               placeholder="Repite tu contraseña"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Crear Cuenta
+            {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
           </button>
-        </form>
 
-        {/* Link a login */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-indigo-600 hover:text-indigo-800 font-medium">
-              Iniciar Sesión
+          <div className="text-center space-y-4">
+            <p className="text-gray-600">
+              ¿Ya tienes cuenta?{' '}
+              <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+                Inicia sesión
+              </Link>
+            </p>
+            <Link href="/" className="block text-gray-500 hover:text-gray-700 text-sm">
+              ← Volver al inicio
             </Link>
-          </p>
-        </div>
-
-        {/* Link de regreso */}
-        <div className="mt-4 text-center">
-          <Link href="/" className="text-gray-500 hover:text-gray-700 text-sm">
-            ← Volver al inicio
-          </Link>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );
