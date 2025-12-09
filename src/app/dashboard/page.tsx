@@ -25,16 +25,18 @@ export default function DashboardPage() {
       }
 
       setUser(session.user);
+
+          // Obtener rol del usuario
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+          setUserRole(profile?.role || null);
     } catch (error) {
 
-            // Obtener rol del usuario
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();      setUserRole(profile?.role || null);
-      console.error('Error:', error);
-      router.push('/login');
+      console.error('Error:', error);      
+            router.push('/login');
     } finally {
       setLoading(false);
     }
