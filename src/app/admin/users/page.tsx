@@ -23,6 +23,7 @@ export default function AdminUsersPage() {
     full_name: '',
     email: '',
     role: 'teacher',
+        password: '',
     school: ''
   });
 
@@ -107,7 +108,7 @@ export default function AdminUsersPage() {
       try {
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: formData.email,
-          password: Math.random().toString(36).slice(-8) + 'Aa1!',
+                password: formData.password,
           options: {
             data: {
               full_name: formData.full_name
@@ -176,6 +177,7 @@ export default function AdminUsersPage() {
       full_name: '',
       email: '',
       role: 'teacher',
+            password: '',
       school: ''
     });
     setEditingUser(null);
@@ -241,6 +243,17 @@ export default function AdminUsersPage() {
                   />
                 </div>
               )}
+
+                        <div>
+                                      <label className="block text-sm font-medium mb-1">Contraseña *</label>
+                                      <input
+                                                      type="password"
+                                                      value={formData.password}
+                                                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                                      className="w-full p-2 border rounded"
+                                                      required
+                                                    />
+                                    </div>
 
               <div>
                 <label className="block text-sm font-medium mb-1">Rol *</label>
