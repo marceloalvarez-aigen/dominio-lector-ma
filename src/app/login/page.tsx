@@ -1,0 +1,106 @@
+"use client";
+
+import { useState } from 'react';
+import Link from 'next/link';
+
+export default function LoginPage() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // TODO: Integrar con Supabase Auth
+      console.log('Datos de inicio de sesión:', formData);
+      alert('Función de inicio de sesión en desarrollo. Datos: ' + JSON.stringify(formData));
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
+          <p className="text-gray-600">Accede a Dominio Lector MA</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="tu@email.com"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <Link href="/recuperar-password" className="text-blue-600 hover:text-blue-700 font-medium">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+          </button>
+
+          <div className="text-center space-y-4">
+            <p className="text-gray-600">
+              ¿No tienes una cuenta?{' '}
+              <Link href="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
+                Regístrate aquí
+              </Link>
+            </p>
+            <Link href="/" className="block text-gray-500 hover:text-gray-700 text-sm">
+              ← Volver al inicio
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
