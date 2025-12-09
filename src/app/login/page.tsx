@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -20,14 +24,21 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
-      // TODO: Integrar con Supabase Auth
-      console.log('Datos de inicio de sesión:', formData);
-      alert('Función de inicio de sesión en desarrollo. Datos: ' + JSON.stringify(formData));
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al iniciar sesión');
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) throw signInError;
+
+      // Redirigir al dashboard después del login exitoso
+      router.push('/dashboard');
+    } catch (error: any) {
+      console.error('Error al iniciar sesión:', error);
+      setError(error.message || 'Error al iniciar sesión. Verifica tus credenciales.');
     } finally {
       setLoading(false);
     }
@@ -40,6 +51,12 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
           <p className="text-gray-600">Accede a Dominio Lector MA</p>
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
