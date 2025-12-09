@@ -66,18 +66,11 @@ export default function AdminUsersPage() {
 
       if (error) throw error;
 
-      // Obtener emails de auth.users
-      const usersWithEmails = await Promise.all(
-        (data || []).map(async (profile) => {
-          const { data: authData } = await supabase.auth.admin.getUserById(profile.id);
-          return {
-            ...profile,
-            email: authData?.user?.email || 'N/A'
-          };
-        })
+
+      setUsers(data as User[]);
       );
 
-      setUsers(usersWithEmails as User[]);
+
     } catch (error) {
       console.error('Error cargando usuarios:', error);
     } finally {
@@ -131,7 +124,8 @@ export default function AdminUsersPage() {
               id: authData.user.id,
               full_name: formData.full_name,
               role: formData.role,
-              school: formData.school || null
+              school: formData.school || null,
+              email: formData.email
             });
 
           if (profileError) throw profileError;
