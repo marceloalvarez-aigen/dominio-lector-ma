@@ -148,6 +148,7 @@ export default function AdminUsersPage() {
       full_name: user.full_name,
       email: user.email || '',
       role: user.role,
+            password: '',
       school: user.school || ''
     });
     setShowForm(true);
@@ -244,6 +245,8 @@ export default function AdminUsersPage() {
                 </div>
               )}
 
+                        {!editingUser && (
+
                         <div>
                                       <label className="block text-sm font-medium mb-1">Contraseña *</label>
                                       <input
@@ -254,6 +257,7 @@ export default function AdminUsersPage() {
                                                       required
                                                     />
                                     </div>
+                      )}
 
               <div>
                 <label className="block text-sm font-medium mb-1">Rol *</label>
