@@ -107,6 +107,7 @@ export default function AdminCoursesPage() {
             grade_level: formData.grade_level,
             description: formData.description || null
           });
+                      console.log('Resultado insert:', { error, data: undefined });
 
         if (error) throw error;
 
