@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+    const [userRole, setUserRole] = useState<string | null>(null);
   useEffect(() => {
     checkUser();
   }, []);
@@ -25,6 +26,15 @@ export default function DashboardPage() {
 
       setUser(session.user);
     } catch (error) {
+
+            // Obtener rol del usuario
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+      setUserRole(profile?.role || null);
       console.error('Error:', error);
       router.push('/login');
     } finally {
@@ -53,6 +63,11 @@ export default function DashboardPage() {
             <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">DL</span>
             </div>
+                      {userRole === 'admin' && (
+            <Link href="/admin" className="text-sm text-indigo-600 hover:text-indigo-900 font-medium">
+              ⚙️ Panel Admin
+            </Link>
+          )}
             <span className="text-2xl font-bold text-gray-800">Dominio Lector MA</span>
           </Link>
           <button
