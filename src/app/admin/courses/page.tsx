@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase/client';
 interface Course {
   id: string;
   name: string;
-  grade: string;
+  grade_level: string;
   description: string | null;
   created_at?: string;
 }
@@ -21,7 +21,7 @@ export default function AdminCoursesPage() {
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    grade: '',
+    grade_level: '',
     description: ''
   });
 
@@ -83,7 +83,7 @@ export default function AdminCoursesPage() {
           .from('courses')
           .update({
             name: formData.name,
-            grade: formData.grade,
+            grade_level: formData.grade_level,
             description: formData.description || null
           })
           .eq('id', editingCourse.id);
@@ -104,7 +104,7 @@ export default function AdminCoursesPage() {
           .from('courses')
           .insert({
             name: formData.name,
-            grade: formData.grade,
+            grade_level: formData.grade_level,
             description: formData.description || null
           });
 
@@ -124,7 +124,7 @@ export default function AdminCoursesPage() {
     setEditingCourse(course);
     setFormData({
       name: course.name,
-      grade: course.grade,
+      grade_level: course.grade_level,
       description: course.description || ''
     });
     setShowForm(true);
@@ -152,7 +152,7 @@ export default function AdminCoursesPage() {
   const resetForm = () => {
     setFormData({
       name: '',
-      grade: '',
+      grade_level: '',
       description: ''
     });
     setEditingCourse(null);
@@ -210,8 +210,8 @@ export default function AdminCoursesPage() {
                 <label className="block text-sm font-medium mb-1">Grado *</label>
                 <input
                   type="text"
-                  value={formData.grade}
-                  onChange={(e) => setFormData({...formData, grade: e.target.value})}
+                  value={formData.grade_level}
+                  onChange={(e) => setFormData({...formData, grade_level: e.target.value})}
                   className="w-full p-2 border rounded"
                   placeholder="Ej: 1° Básico, 3° Medio"
                   required
@@ -263,7 +263,7 @@ export default function AdminCoursesPage() {
                 {courses.map((course) => (
                   <tr key={course.id} className="border-b">
                     <td className="py-3">{course.name}</td>
-                    <td className="py-3">{course.grade}</td>
+                    <td className="py-3">{course.grade_level}</td>
                     <td className="py-3">{course.description || '-'}</td>
                     <td className="py-3">
                       <div className="flex gap-2">
