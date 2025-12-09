@@ -63,13 +63,14 @@ export default function DashboardPage() {
             <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">DL</span>
             </div>
-                      {userRole === 'admin' && (
+            <span className="text-2xl font-bold text-gray-800">Dominio Lector MA</span>
+          </Link>
+                                {userRole === 'admin' && (
             <Link href="/admin" className="text-sm text-indigo-600 hover:text-indigo-900 font-medium">
               ⚙️ Panel Admin
             </Link>
           )}
-            <span className="text-2xl font-bold text-gray-800">Dominio Lector MA</span>
-          </Link>
+
           <button
             onClick={handleSignOut}
             className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
