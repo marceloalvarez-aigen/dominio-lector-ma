@@ -241,11 +241,9 @@ export default function AdminUsersPage() {
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className="w-full p-2 border rounded"
                     required
-                                  {/* Campo de contraseña para nuevos usuarios */}
                   />
                 </div>
               )}
-
                         {!editingUser && (
 
                         <div>
