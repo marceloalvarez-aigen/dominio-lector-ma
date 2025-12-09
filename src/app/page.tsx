@@ -3,10 +3,6 @@
 import Link from 'next/link';
 
 export default function Home() {
-  const handleStartClick = () => {
-    alert('¡Bienvenido! La funcionalidad de registro estará disponible próximamente.');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -45,12 +41,12 @@ export default function Home() {
             Automatiza el diagnóstico de fluidez y velocidad lectora.
             Ahorra horas de trabajo administrativo y enfócate en enseñar.
           </p>
-          <button
-            onClick={handleStartClick}
-            className="px-8 py-4 bg-indigo-600 text-white text-lg rounded-lg hover:bg-indigo-700 transition shadow-lg cursor-pointer"
+          <Link
+            href="/register"
+            className="inline-block px-8 py-4 bg-indigo-600 text-white text-lg rounded-lg hover:bg-indigo-700 transition shadow-lg cursor-pointer"
           >
             Comenzar Gratis
-          </button>
+          </Link>
         </div>
       </main>
 
