@@ -68,7 +68,7 @@ export default function AdminUsersPage() {
 
 
       setUsers(data as User[]);
-      );
+
 
 
     } catch (error) {
